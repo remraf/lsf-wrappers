@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# Description: LSF wrapper script
+# Author: Tony Vo
+# Date: 2022-09-25
+#
+###
+
+########## BEGIN USER CUSTOMIZATION ##########
+
+DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
+GROUP=compute-ris
+OPTIONS="-e %J.e -o %J.o"
+OPTIONS_INTERACTIVE="-R 'span[ptile=1]' -Is"
+PATH_EXT=/export/bin
+QUEUE=general
+QUEUE_INTERACTIVE=general-interactive
+VOLUMES="\
+    /scratch1/fs1/ris/application/act:/act \
+    /scratch1/fs1/ris/application/export:/export \
+    /scratch1/fs1/ris/application/opt:/opt \
+    /scratch1/fs1/ris/application/export/SBGrid:/programs \
+    /scratch1/fs1/tonyvo:/scratch1/fs1/tonyvo \
+    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active\
+    $HOME:$HOME \
+    "
+########### END USER CUSTOMIZATION ###########
+
+batch()
+{
+    PATH=$PATH:$PATH_EXT \
+    LSF_DOCKER_VOLUMES=$VOLUMES \
+    LSF_DOCKER_RUN_LOGLEVEL=DEBUG \
+    bsub \
+        -G $GROUP \
+        -q $QUEUE \
+        -a "docker($DOCKER_IMAGE)" \
+        $OPTIONS \
+        "$@"
+}
+
+interactive()
+{
+    PATH=$PATH:$PATH_EXT \
+    LSF_DOCKER_VOLUMES=$VOLUMES \
+    bsub \
+        -G $GROUP \
+        -q $QUEUE_INTERACTIVE \
+        -a "docker($DOCKER_IMAGE)" \
+        $OPTIONS_INTERACTIVE \
+        "$@"
+}
+
+usage()
+{
+    echo "Usage:"
+    echo "  wrap [-bhi] <PROGRAM>"
+    echo "Description: LSF wrapper script"
+    echo "Options:"
+    echo -e "\t-b run batch job"
+    echo -e "\t-h Help (Display usage)"
+    echo -e "\t-i run interactive job"
+}
+
+while getopts :bhi OPT
+do
+    shift
+    case $OPT in
+        b)
+            batch $@
+            ;;
+        h)
+            usage
+            ;;
+        i)
+            interactive $@
+            ;;
+        *)
+            echo "Invalid option: -$OPTARG"
+            echo "See wrap -h"
+            ;;
+    esac
+done
