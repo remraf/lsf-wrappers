@@ -9,12 +9,14 @@
 ########## BEGIN USER CUSTOMIZATION ##########
 
 DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
+FILE="$@"
 GROUP=compute-ris
 OPTIONS="-e %J.e -o %J.o"
 OPTIONS_INTERACTIVE="-R 'span[ptile=1]' -Is"
 PATH_EXT=/export/bin
-QUEUE=general
-QUEUE_INTERACTIVE=general-interactive
+PROGRAM="$@"
+QUEUE=qa
+QUEUE_INTERACTIVE=qa-interactive
 VOLUMES="\
     /scratch1/fs1/ris/application/act:/act \
     /scratch1/fs1/ris/application/export:/export \
@@ -36,7 +38,19 @@ batch()
         -q $QUEUE \
         -a "docker($DOCKER_IMAGE)" \
         $OPTIONS \
-        "$@"
+        < "$PROGRAM" 
+}
+
+check_parameters()
+{
+    if [[ $# -ne 1 ]]
+    then
+        echo "Error: single argument required"
+        echo "See wrap -h"
+        exit 1
+    else
+        PROGRAM="$1"
+    fi  
 }
 
 interactive()
@@ -48,7 +62,7 @@ interactive()
         -q $QUEUE_INTERACTIVE \
         -a "docker($DOCKER_IMAGE)" \
         $OPTIONS_INTERACTIVE \
-        "$@"
+        "$PROGRAM"
 }
 
 usage()
@@ -62,18 +76,21 @@ usage()
     echo -e "\t-i run interactive job"
 }
 
+
 while getopts :bhi OPT
 do
     shift
     case $OPT in
         b)
-            batch $@
+            check_parameters $@
+            batch
             ;;
         h)
             usage
             ;;
         i)
-            interactive $@
+            check_parameters $@
+            interactive
             ;;
         *)
             echo "Invalid option: -$OPTARG"
