@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Description: LSF wrapper script
+# Description: LSF wrapper script to run a program
 # Author: Tony Vo
 # Date: 2022-09-25
 #
@@ -43,6 +43,7 @@ batch()
 
 check_parameters()
 {
+    # Require single PROGRAM argument
     if [[ $# -ne 1 ]]
     then
         echo "Error: single argument required"
@@ -69,7 +70,7 @@ usage()
 {
     echo "Usage:"
     echo "  wrap [-bhi] <PROGRAM>"
-    echo "Description: LSF wrapper script"
+    echo "Description: LSF wrapper script to run a PROGRAM"
     echo "Options:"
     echo -e "\t-b run batch job"
     echo -e "\t-h Help (Display usage)"
