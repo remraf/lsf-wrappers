@@ -12,11 +12,12 @@ DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
 FILE="$@"
 GROUP=compute-ris
 OPTIONS="-e %J.e -o %J.o"
-OPTIONS_INTERACTIVE="-R 'span[ptile=1]' -Is"
+OPTIONS_INTERACTIVE="-Is"
 PATH_EXT=/export/bin
 PROGRAM="$@"
 QUEUE=qa
 QUEUE_INTERACTIVE=qa-interactive
+URL="registry.gsc.wustl.edu/tonyvo"
 VOLUMES="\
     /scratch1/fs1/ris/application/act:/act \
     /scratch1/fs1/ris/application/export:/export \
@@ -45,26 +46,13 @@ build_image()
 {
     PATH=$PATH:$PATH_EXT \
     LSF_DOCKER_VOLUMES=$VOLUMES \
-    DOCKER_URL="registry.gcr.wustl.edu/tonyvo/$TAG"
+    DOCKER_URL="${URL}/${TAG}"
     bsub \
         -G $GROUP \
         -q $QUEUE_INTERACTIVE \
         -a "docker_build($DOCKER_URL)" \
         $OPTIONS_INTERACTIVE \
         -- --tag $TAG . 
-}
-
-check_parameters()
-{
-    # Require single PROGRAM argument
-    if [[ $# -ne 1 ]]
-    then
-        echo "Error: single argument required"
-        echo "See wrap -h"
-        exit 1
-    else
-        PROGRAM="$1"
-    fi  
 }
 
 interactive()
@@ -91,16 +79,21 @@ usage()
     echo -e "\t-i run interactive job"
 }
 
+#
+# MAIN
+###
 
-while getopts :bd:hi OPT
+while getopts b:d:hi: OPT
 do
     shift
     case $OPT in
         b)
-            check_parameters $@
+            # Batch Jobs
+            PROGRAM=$OPTARG
             batch
             ;;
         d)
+            # Docker Build Jobs
             TAG=$OPTARG
             build_image
             ;; 
@@ -108,7 +101,8 @@ do
             usage
             ;;
         i)
-            check_parameters $@
+            # Interactive Jobs
+            PROGRAM=$OPTARG
             interactive
             ;;
         *)
