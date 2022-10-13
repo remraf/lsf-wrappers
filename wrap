@@ -24,7 +24,7 @@ VOLUMES="\
     /scratch1/fs1/ris/application/opt:/opt \
     /scratch1/fs1/ris/application/export/SBGrid:/programs \
     /scratch1/fs1/tonyvo:/scratch1/fs1/tonyvo \
-    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active\
+    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active \
     $HOME:$HOME \
     "
 ########### END USER CUSTOMIZATION ###########
