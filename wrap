@@ -9,7 +9,6 @@
 ########## BEGIN USER CUSTOMIZATION ##########
 
 DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
-FILE="$@"
 GROUP=compute-ris
 OPTIONS=(
     -e %J.e 
