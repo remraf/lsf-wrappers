@@ -111,7 +111,6 @@ do
             interactive
             ;;
         *)
-            echo "Invalid option: -$OPTARG"
             echo "See wrap -h"
             ;;
     esac
