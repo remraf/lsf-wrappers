@@ -70,13 +70,13 @@ interactive()
 usage()
 {
     echo "Usage:"
-    echo "  wrap [-bdhi] <PROGRAM>"
+    echo -e "  wrap [-bdhi] <PROGRAM>\n"
     echo "Description: LSF wrapper script to run a PROGRAM or build a docker image"
     echo "Options:"
-    echo -e "\t-b run batch job"
-    echo -e "\t-d <TAG> build docker image"
-    echo -e "\t-h Help (Display usage)"
-    echo -e "\t-i run interactive job"
+    echo -e "\t-b \n\t   run batch job"
+    echo -e "\t-d \n\t   -d <TAG> \n\t   build docker image and specify image tag"
+    echo -e "\t-h \n\t   Help (Display usage)"
+    echo -e "\t-i \n\t   run interactive job"
 }
 
 #
