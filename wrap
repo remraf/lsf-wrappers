@@ -18,21 +18,21 @@ PROGRAM="$@"
 QUEUE=qa
 QUEUE_INTERACTIVE=qa-interactive
 URL="registry.gsc.wustl.edu/tonyvo"
-VOLUMES="\
-    /scratch1/fs1/ris/application/act:/act \
-    /scratch1/fs1/ris/application/export:/export \
-    /scratch1/fs1/ris/application/opt:/opt \
-    /scratch1/fs1/ris/application/export/SBGrid:/programs \
-    /scratch1/fs1/tonyvo:/scratch1/fs1/tonyvo \
-    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active \
-    $HOME:$HOME \
-    "
+VOLUMES=(
+    /scratch1/fs1/ris/application/act:/act
+    /scratch1/fs1/ris/application/export:/export
+    /scratch1/fs1/ris/application/opt:/opt
+    /scratch1/fs1/ris/application/export/SBGrid:/programs
+    /scratch1/fs1/tonyvo:/scratch1/fs1/tonyvo
+    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active
+    $HOME:$HOME
+    )
 ########### END USER CUSTOMIZATION ###########
 
 batch()
 {
     PATH=$PATH:$PATH_EXT \
-    LSF_DOCKER_VOLUMES=$VOLUMES \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
     LSF_DOCKER_RUN_LOGLEVEL=DEBUG \
     bsub \
         -G $GROUP \
@@ -45,7 +45,7 @@ batch()
 build_image()
 {
     PATH=$PATH:$PATH_EXT \
-    LSF_DOCKER_VOLUMES=$VOLUMES \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
     DOCKER_URL="${URL}/${TAG}"
     bsub \
         -G $GROUP \
@@ -58,7 +58,7 @@ build_image()
 interactive()
 {
     PATH=$PATH:$PATH_EXT \
-    LSF_DOCKER_VOLUMES=$VOLUMES \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
     bsub \
         -G $GROUP \
         -q $QUEUE_INTERACTIVE \
