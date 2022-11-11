@@ -11,8 +11,13 @@
 DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
 FILE="$@"
 GROUP=compute-ris
-OPTIONS="-e %J.e -o %J.o"
-OPTIONS_INTERACTIVE="-Is"
+OPTIONS=(
+    -e %J.e 
+    -o %J.o
+    )
+OPTIONS_INTERACTIVE=(
+    -Is
+    )
 PATH_EXT=/export/bin
 PROGRAM="$@"
 QUEUE=qa
@@ -38,7 +43,7 @@ batch()
         -G $GROUP \
         -q $QUEUE \
         -a "docker($DOCKER_IMAGE)" \
-        $OPTIONS \
+        ${OPTIONS[@]} \
         < "$PROGRAM" 
 }
 
@@ -51,7 +56,7 @@ build_image()
         -G $GROUP \
         -q $QUEUE_INTERACTIVE \
         -a "docker_build($DOCKER_URL)" \
-        $OPTIONS_INTERACTIVE \
+        ${OPTIONS_INTERACTIVE[@]} \
         -- --tag $TAG . 
 }
 
@@ -63,7 +68,7 @@ interactive()
         -G $GROUP \
         -q $QUEUE_INTERACTIVE \
         -a "docker($DOCKER_IMAGE)" \
-        $OPTIONS_INTERACTIVE \
+        ${OPTIONS_INTERACTIVE[@]} \
         "$PROGRAM"
 }
 
