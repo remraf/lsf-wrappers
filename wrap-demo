@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+#
+# Description: LSF wrapper script to run a program or build a docker image
+# Author: Tony Vo
+# Date: 2022-09-25
+#
+###
+
+########## BEGIN USER CUSTOMIZATION ##########
+
+DOCKER_IMAGE="ghcr.io/washu-it-ris/ris-thpc:ubuntu20"
+GROUP=compute-ris
+OPTIONS=(
+    -e %J.e 
+    -o %J.o
+    )
+OPTIONS_INTERACTIVE=(
+    -Is
+    -M 64GB
+    -n 8
+    -R rusage[mem=64GB]
+    )
+PATH_EXT=
+PROGRAM="$@"
+QUEUE=qa
+QUEUE_INTERACTIVE=qa-interactive
+URL=
+VOLUMES=(
+    /scratch1/fs1/gunnar/thpc:/opt/versions
+    $HOME:$HOME
+    )
+########### END USER CUSTOMIZATION ###########
+
+batch()
+{
+    PATH=$PATH:$PATH_EXT \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
+    LSF_DOCKER_RUN_LOGLEVEL=DEBUG \
+    bsub \
+        -G $GROUP \
+        -q $QUEUE \
+        -a "docker($DOCKER_IMAGE)" \
+        ${OPTIONS[@]} \
+        < "$PROGRAM" 
+}
+
+build_image()
+{
+    PATH=$PATH:$PATH_EXT \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
+    DOCKER_URL="${URL}/${TAG}"
+    bsub \
+        -G $GROUP \
+        -q $QUEUE_INTERACTIVE \
+        -a "docker_build($DOCKER_URL)" \
+        ${OPTIONS_INTERACTIVE[@]} \
+        -- --tag $TAG . 
+}
+
+interactive()
+{
+    PATH=$PATH:$PATH_EXT \
+    LSF_DOCKER_VOLUMES="${VOLUMES[@]}" \
+    bsub \
+        -G $GROUP \
+        -q $QUEUE_INTERACTIVE \
+        -a "docker($DOCKER_IMAGE)" \
+        ${OPTIONS_INTERACTIVE[@]} \
+        "$PROGRAM"
+}
+
+usage()
+{
+    echo "Usage:"
+    echo -e "  wrap [-bdhi] <PROGRAM>\n"
+    echo "Description: LSF wrapper script to run a PROGRAM or build a docker image"
+    echo "Options:"
+    echo -e "\t-b \n\t   -b <PROGRAM> \n\t   run batch job"
+    echo -e "\t-d \n\t   -d <TAG> \n\t   build docker image and specify image tag"
+    echo -e "\t-h \n\t   Help (Display usage)"
+    echo -e "\t-i \n\t   -i <PROGRAM> \n\t   run interactive job"
+}
+
+#
+# MAIN
+###
+
+while getopts b:d:hi: OPT
+do
+    shift
+    case $OPT in
+        b)
+            # Batch Jobs
+            PROGRAM=$OPTARG
+            batch
+            ;;
+        d)
+            # Docker Build Jobs
+            TAG=$OPTARG
+            build_image
+            ;; 
+        h)
+            usage
+            ;;
+        i)
+            # Interactive Jobs
+            PROGRAM=$OPTARG
+            interactive
+            ;;
+        *)
+            echo "See wrap -h"
+            ;;
+    esac
+done
