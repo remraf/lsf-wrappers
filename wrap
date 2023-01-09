@@ -8,8 +8,8 @@
 
 ########## BEGIN USER CUSTOMIZATION ##########
 
-DOCKER_IMAGE="gcr.io/ris-registry-shared/base-terminal"
-GROUP=compute-ris
+DOCKER_IMAGE=
+GROUP=
 OPTIONS=(
     -e %J.e 
     -o %J.o
@@ -17,18 +17,12 @@ OPTIONS=(
 OPTIONS_INTERACTIVE=(
     -Is
     )
-PATH_EXT=/export/bin
+PATH_EXT=
 PROGRAM="$@"
 QUEUE=qa
 QUEUE_INTERACTIVE=qa-interactive
-URL="registry.gsc.wustl.edu/tonyvo"
+URL=
 VOLUMES=(
-    /scratch1/fs1/ris/application/act:/act
-    /scratch1/fs1/ris/application/export:/export
-    /scratch1/fs1/ris/application/opt:/opt
-    /scratch1/fs1/ris/application/export/SBGrid:/programs
-    /scratch1/fs1/tonyvo:/scratch1/fs1/tonyvo
-    /storage1/fs1/tonyvo/Active:/storage1/fs1/tonyvo/Active
     $HOME:$HOME
     )
 ########### END USER CUSTOMIZATION ###########
